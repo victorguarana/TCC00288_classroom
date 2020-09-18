@@ -61,7 +61,6 @@ DECLARE
     m2_i integer; /*número de linhas da 2a matriz*/
     m2_j integer; /*número de colunas da 2a matriz*/
     result float[][]; /*matriz resposta*/
-    currentElement integer := 0; /*variável auxiliar usada para definir o valor de cada elemento da matriz resposta*/
 BEGIN
     SELECT
         ARRAY_LENGTH(matrix1, 1) INTO m1_i;
@@ -79,10 +78,8 @@ BEGIN
     END IF;
     
     FOR i IN 1..m1_i LOOP
-        currentElement := 0;
-         FOR j IN 1..m2_j LOOP
+        FOR j IN 1..m2_j LOOP
             FOR k IN 1..m2_i LOOP
-                currentElement := currentElement + (matrix1[i][k] * matrix2[k][j]);
                 result[i][j] := result[i][j] + matrix1[i][k] * matrix2[k][j];
             END LOOP;
         END LOOP;
