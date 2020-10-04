@@ -79,12 +79,12 @@ CREATE OR REPLACE FUNCTION gerar_tabela(cod_camp varchar, pos_inicial int, pos_f
     BEGIN
         drop table if exists temp_tabela_campeonato;
         CREATE TEMPORARY TABLE temp_tabela_campeonato(
-            sigla varchar,
+            nome varchar,
             pontos int,
             vitorias int);
 
         for clube in select distinct t.sigla from time_ t loop
-            select t.sigla,
+            select t.nome,
                 count(j.numero) filter (where (j.time1 = clube.sigla and j.gols1 > j.gols2) or (j.time2 = clube.sigla and j.gols1 < j.gols2)) as vitorias,
                 count(j.numero) filter (where j.gols1 = j.gols2) as empates
                 into clube2
@@ -92,14 +92,13 @@ CREATE OR REPLACE FUNCTION gerar_tabela(cod_camp varchar, pos_inicial int, pos_f
                 where clube.sigla = t.sigla and j.campeonato = cod_camp
                 group by t.sigla;
                 
-            raise notice 'sigla: %', clube2.sigla;
             if clube2 is not null then 
-                insert into temp_tabela_campeonato values(clube2.sigla, clube2.vitorias*3 + clube2.empates, clube2.vitorias);
+                insert into temp_tabela_campeonato values(clube2.nome, clube2.vitorias*3 + clube2.empates, clube2.vitorias);
             end if;
 
         end loop;
 
-        return query select t.sigla from temp_tabela_campeonato t order by pontos desc, vitorias desc limit (pos_final - (pos_inicial-1)) offset (pos_inicial-1);
+        return query select t.nome from temp_tabela_campeonato t order by pontos desc, vitorias desc limit (pos_final - (pos_inicial-1)) offset (pos_inicial-1);
         
     END;
 $$
